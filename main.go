@@ -1,7 +1,12 @@
 package main
+
 import (
-	"fmt"
+	"go_shopmarket/database" 
+	"go_shopmarket/handler"
 )
-func main(){
-	fmt.Println("Hello")
+
+func main() {
+	database.ConnectDB()
+
+	shopHandler.AddCategory("Electronics")
 }

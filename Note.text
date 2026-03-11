@@ -3,3 +3,5 @@ go mod init go_shopmarket
 go get github.com/lib/pq
 go get github.com/joho/godotenv
 //
+docker-compose up -d อัพไปยัง docker
+docker-compose down -v
