@@ -1,4 +1,7 @@
 package models
+import(
+	"time"
+)
 
 type Category struct {
 	ID int
@@ -10,4 +13,5 @@ type Products struct {
 	Price float64
 	Stock int
 	CategoryID int
+	Create_at time.Time
 }
