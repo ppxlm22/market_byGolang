@@ -21,12 +21,12 @@ func main() {
 	app.Post("/register", shopHandler.Register)
 	app.Post("/login", shopHandler.Login)
 
-	app.Post("/products", shopHandler.CreateProduct)
+	app.Post("/products", shopHandler.AuthRequired, shopHandler.AdminRequired, shopHandler.CreateProduct)
 	app.Get("/product/:id", shopHandler.Getproduct)
 	app.Get("/products", shopHandler.GetAllproducts)
 
-	app.Put("/product/:id", shopHandler.UpdateProduct)
-	app.Delete("/product/:id", shopHandler.DeleteProduct)
+	app.Put("/product/:id",shopHandler.AuthRequired, shopHandler.AdminRequired, shopHandler.UpdateProduct)
+	app.Delete("/product/:id",shopHandler.AuthRequired, shopHandler.AdminRequired,shopHandler.DeleteProduct)
 	log.Fatal(app.Listen(":5000"))
 
 }
