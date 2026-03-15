@@ -18,6 +18,9 @@ func main() {
 	database.ConnectDB()
 	app := fiber.New()
 
+	app.Post("/register", shopHandler.Register)
+	app.Post("/login", shopHandler.Login)
+
 	app.Post("/products", shopHandler.CreateProduct)
 	app.Get("/product/:id", shopHandler.Getproduct)
 	app.Get("/products", shopHandler.GetAllproducts)

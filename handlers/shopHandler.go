@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -17,8 +18,55 @@ func Register(c *fiber.Ctx) error {
         Email    string `json:"email"`
         Password string `json:"password"`
     }
-	var requ
+	var req RegisterRequest
+	if err := c.BodyParser(&req); 
+	err != nil {
+		return c.Status(400).JSON(fiber.Map{"ERROR":"Data fail"})
+	} 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"ERROR": "Hash fail"})
+	}
+	query := `INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3)`
+	_, err = database.DB.Exec(query, req.Username, req.Email, string(hashedPassword))
+
+	if err != nil {
+        return c.Status(500).JSON(fiber.Map{"ERROR_LOG": err.Error()})
+    }
+
+    return c.JSON(fiber.Map{"message": "Register Success"})
 }	
+func Login(c *fiber.Ctx) error {
+	type Loginrequest struct{
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	var req Loginrequest
+	//ข้อมูลไม่ถูก
+	if err := c.BodyParser(&req)
+	err != nil {
+		return c.Status(400).JSON(fiber.Map{"ERROR": "Data fail"})
+	}
+	fmt.Println(" Postman: [", req.Username, "]")
+
+	var hashedPassword string
+	query := `SELECT password_hash FROM users WHERE username = $1`
+	err := database.DB.QueryRow(query, req.Username).Scan(&hashedPassword)
+	//หา user ไม่เจอ
+	if err != nil {
+        return c.Status(401).JSON(fiber.Map{"error": "NOT Found User"})
+    }
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(req.Password))
+    if err != nil {
+        // ถ้ารหัสไม่ตรงกัน
+        return c.Status(401).JSON(fiber.Map{"error": "รหัสผ่านไม่ถูกต้อง"})
+    }
+	return c.JSON(fiber.Map{
+        "message": "Login Success!",
+        "user": req.Username,
+	})
+}
 
 func Getproduct(c *fiber.Ctx) error {
 	id := c.Params("id")
@@ -26,8 +74,7 @@ func Getproduct(c *fiber.Ctx) error {
 
 	var p models.Products
 
-	query := `SELECT *
-	FROM public.products WHERE id = $1;`
+	query := `SELECT * FROM public.products WHERE id = $1;`
 
 	err := database.DB.QueryRow(query, id).Scan(&p.ID, &p.Name, &p.Price, &p.Stock, &p.CategoryID, &p.Create_at)
 
