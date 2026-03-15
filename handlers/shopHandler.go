@@ -5,11 +5,20 @@ import (
 	"go_shopmarket/database"
 	_ "go_shopmarket/database"
 	"go_shopmarket/models"
+	"strconv"
 
 	"fmt"
-
 	"github.com/gofiber/fiber/v2"
+	"golang.org/x/crypto/bcrypt"
 )
+func Register(c *fiber.Ctx) error {
+	type RegisterRequest struct {
+        Username string `json:"username"`
+        Email    string `json:"email"`
+        Password string `json:"password"`
+    }
+	var requ
+}	
 
 func Getproduct(c *fiber.Ctx) error {
 	id := c.Params("id")
@@ -31,10 +40,10 @@ func Getproduct(c *fiber.Ctx) error {
 
 	return c.JSON(&p)
 }
-func Getallproducts(c *fiber.Ctx) error {
+func GetAllproducts(c *fiber.Ctx) error {
 	var p models.Products
 	var proDucts []models.Products
-	
+
 	query := `SELECT * FROM public.products;`
 	rows, _ := database.DB.Query(query)
 
@@ -44,18 +53,46 @@ func Getallproducts(c *fiber.Ctx) error {
 			return err
 		}
 		fmt.Println(p)
-		proDucts = append(proDucts,p)
+		proDucts = append(proDucts, p)
 	}
 
 	return c.JSON(proDucts)
 
 }
-func Createproduct(c *fiber.Ctx) error {
-	var p models.Products
-	query := `INSERT 
-				INTO public.products(
-				id, name, price, stock, category_id, create_at)
-				VALUES (?, ?, ?, ?, ?, ?);`
+func CreateProduct(c *fiber.Ctx) error {
+	fmt.Println("CreateProduct")
+	p := new(models.Products)
+	if err := c.BodyParser(p); err != nil {
+		return err
+	}
+	_, err := database.DB.Exec("INSERT INTO public.products (name, price, stock, category_id ) VALUES ($1, $2, $3, $4)", p.Name, p.Price, p.Stock, p.CategoryID)
+	if err != nil {
+		return err
+	}
+	return c.JSON(p)
 
-	
+}
+
+func UpdateProduct(c *fiber.Ctx) error {
+	id := c.Params("id")
+	p := new(models.Products)
+	if err := c.BodyParser(p); err != nil {
+		return err
+	}
+	_, err := database.DB.Exec("UPDATE public.products SET name = $1, price = $2,stock = $3 ,category_id = $4 WHERE id = $5", p.Name, p.Price, p.Stock, p.CategoryID, id)
+	if err != nil {
+		return err
+	}
+	p.ID, _ = strconv.Atoi(id)
+	return c.JSON(p)
+}
+func DeleteProduct(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	_, err := database.DB.Exec("DELETE FROM public.products WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+
+	return c.SendStatus(fiber.StatusNoContent)
 }
