@@ -2,22 +2,35 @@ package register
 
 import (
 	"errors"
-
-	"github.com/gofiber/fiber/v2"
+	"golang.org/x/crypto/bcrypt"
 )
+type Service interface {
+	RegisterUser(req registerDB) error
+}
 
-func Register_Service(req RegisterRequest) error {
-	if req.Username == "" || req.Email == "" || req.Password == "" {
-		return errors.New("กรุณากรอกให้ครบ")
-	}
-	RegisteruUser := registerDB{
-		Username: req.Username,
-		Email:    req.Email,
-		Password: req.Password,
-	}
-	if err := Register(RegisteruUser); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
+type service struct {
+	repo Repository
+}
 
+func NewService(r Repository) Service {
+	return &service{
+		repo: r,
+	}
+}
+
+func (s *service) RegisterUser(req registerDB) error {
+	if req.Password == "" {
+		return errors.New("กรุณากรอกรหัสผ่าน")
+	}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
+	if err != nil {
+		return errors.New("เกิดข้อผิดพลาดในการเข้ารหัสรหัสผ่าน")
+	}
+	req.Password = string(hashedPassword)
+
+	err = s.repo.Register(req)
+	if err != nil {
+		return err
+	}
 	return nil
 }
