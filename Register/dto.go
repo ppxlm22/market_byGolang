@@ -6,7 +6,7 @@ type RegisterRequest struct {
         Password string `json:"password"`
 }
 type registerDB struct {
-		Username string
+	Username string
         Email    string
         Password string
 }

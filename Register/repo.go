@@ -4,9 +4,8 @@ import "go_shopmarket/database"
 
 type Repository interface {
 	Register(req registerDB) error
+
 }
-
-
 type repository struct{}
 
 func NewRepository() Repository {
