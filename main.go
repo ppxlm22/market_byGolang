@@ -1,32 +1,34 @@
 package main
 
 import (
-	"fmt"
-	"go_shopmarket/database"
-	shopHandler "go_shopmarket/handlers"
+	"go_shopmarket/config"
+	"go_shopmarket/register"
 	"log"
+	"go_shopmarket/database"
+	loginRepo "go_shopmarket/login/repository"
+	loginSvc  "go_shopmarket/login/service"
+	loginHdl  "go_shopmarket/login/handler"
+	
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("Warning: .env file not found")
-	}
-	fmt.Println("CONNECT ENV")
+	_ = config.LoadConfig()
 	database.ConnectDB()
+
+	userRepo := register.NewRepository()      
+	userService := register.NewService(userRepo)
+	userHandler := register.NewHandler(userService)
+
+	loginRepo := loginRepo.NewRepository()
+	loginService := loginSvc.NewService(loginRepo)
+	loginHandler := loginHdl.NewHandler(loginService)
+
 	app := fiber.New()
 
-	app.Post("/register", shopHandler.Register)
-	app.Post("/login", shopHandler.Login)
-
-	app.Post("/products", shopHandler.AuthRequired, shopHandler.AdminRequired, shopHandler.CreateProduct)
-	app.Get("/product/:id", shopHandler.Getproduct)
-	app.Get("/products", shopHandler.GetAllproducts)
-
-	app.Put("/product/:id",shopHandler.AuthRequired, shopHandler.AdminRequired, shopHandler.UpdateProduct)
-	app.Delete("/product/:id",shopHandler.AuthRequired, shopHandler.AdminRequired,shopHandler.DeleteProduct)
+	app.Post("/login", loginHandler.Login_Service)
+	app.Post("/register", userHandler.Register_Service)
 	log.Fatal(app.Listen(":5000"))
 
 }
