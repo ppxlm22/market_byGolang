@@ -19,7 +19,7 @@ func NewService(r repository.Repository) Service {
 }
 
 func (s *service) LoginUser(req dto.LoginRequest) (string, error) {
-	userID,hashedPassword, err := s.repo.GetUserByUsername(req.Username)
+	userID,hashedPassword, userRole, err := s.repo.GetUserByUsername(req.Username)
 	if err != nil {
 		log.Println("Error จาก Database:", err)
 		return "", errors.New("ชื่อผู้ใช้ หรือ รหัสไม่ถูกต้อง")
@@ -32,9 +32,9 @@ func (s *service) LoginUser(req dto.LoginRequest) (string, error) {
 	}
 	jwtSecret := []byte("your_secret_key")
 	claims := jwt.MapClaims{
-		"user_id":  userID,
+		"user_id":  userID,	
 		"username": req.Username,
-		"role":     "customer",
+		"role":     userRole,
 		"exp":      time.Now().Add(time.Hour * 24).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -42,5 +42,6 @@ func (s *service) LoginUser(req dto.LoginRequest) (string, error) {
 	if err != nil {
 		return "", errors.New("ไม่สามารถสร้าง Token ได้")
 	}
+	
 	return t, nil
 }

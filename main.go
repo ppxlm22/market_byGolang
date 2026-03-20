@@ -18,7 +18,7 @@ import (
 	productHdl  "go_shopmarket/products/handler"
 
 
-
+	"go_shopmarket/middleware"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -42,11 +42,11 @@ func main() {
 
 	app.Post("/login", loginHandler.Login_Service)
 	app.Post("/register", userHandler.Register_Service)
-	app.Post("/products", productHandler.CreateProduct)
+	app.Post("/products", middleware.Protected(),middleware.AdminOnly(), productHandler.CreateProduct)
 	app.Get("/products", productHandler.GetAllProducts)
 	app.Get("/product/:id", productHandler.GetProductByID)
-	app.Put("/product/:id", productHandler.UpdateProduct)
-	app.Delete("/product/:id", productHandler.DeleteProduct)
+	app.Put("/product/:id", middleware.Protected(),middleware.AdminOnly(), productHandler.UpdateProduct)
+	app.Delete("/product/:id", middleware.Protected(),middleware.AdminOnly(), productHandler.DeleteProduct)
 	log.Fatal(app.Listen(":5000"))
 
 }
