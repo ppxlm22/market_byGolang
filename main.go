@@ -44,7 +44,8 @@ func main() {
 	app.Post("/register", userHandler.Register_Service)
 	app.Post("/products", productHandler.CreateProduct)
 	app.Get("/products", productHandler.GetAllProducts)
-	app.Get("/products/:id", productHandler.GetProductByID)
+	app.Get("/product/:id", productHandler.GetProductByID)
+	app.Put("/product/:id", productHandler.UpdateProduct)
 	log.Fatal(app.Listen(":5000"))
 
 }

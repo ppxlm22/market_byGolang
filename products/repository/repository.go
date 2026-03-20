@@ -49,3 +49,11 @@ func (r *repository) GetProductByID(id int) (dto.Products, error) {
 	}
 	return product, nil
 }
+func (r *repository) UpdateProduct(id int, product dto.Products) error {
+	query := `UPDATE public.products SET name = $1, price = $2,stock = $3 ,category_id = $4 WHERE id = $5`
+	_, err := database.DB.Exec(query, product.Name, product.Price, product.Stock, product.CategoryID, id)
+	if err != nil {
+		return err	
+	}
+	return nil
+}

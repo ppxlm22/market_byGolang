@@ -54,3 +54,27 @@ func (h *Handler) GetProductByID(c *fiber.Ctx) error {
 		"product": product,
 	})
 }	
+func (h *Handler) UpdateProduct(c *fiber.Ctx) error {
+	var req dto.Products
+	id, err := c.ParamsInt("id")	
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "ID ต้องเป็นตัวเลข",
+		})
+	}
+	if err := c.BodyParser(&req); 
+		err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "ข้อมูลไม่ถูกต้อง",
+			})
+	}
+	if err := h.service.UpdateProduct(id, req);
+		err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "อัพเดตสินค้าสำเร็จ",
+	})
+}
