@@ -6,5 +6,5 @@ import (
 
 type Service interface {
 	CreateProduct(product dto.Products) error
+	GetAllProducts() ([]dto.Products, error)
 }
-

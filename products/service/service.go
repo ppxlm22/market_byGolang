@@ -20,3 +20,13 @@ func (s *service) CreateProduct(product dto.Products) error {
 	}
 	return s.repo.CreateProduct(product)
 }
+func (s *service) GetAllProducts() ([]dto.Products, error) {
+	product, err := s.repo.GetAllProducts()
+	if err != nil {
+		return nil, err
+	}
+	if len(product) == 0 {
+		return nil, errors.New("ไม่พบสินค้า")
+	}
+	return product, nil
+}	

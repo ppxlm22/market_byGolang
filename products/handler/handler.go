@@ -26,3 +26,14 @@ func (h *Handler) CreateProduct(c *fiber.Ctx) error {
 		"message": "สร้างสินค้าสำเร็จ",
 	})
 }
+func (h *Handler) GetAllProducts(c *fiber.Ctx) error {
+	products, err := h.service.GetAllProducts()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"products": products,
+	})
+}

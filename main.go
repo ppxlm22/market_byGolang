@@ -18,6 +18,7 @@ import (
 	productHdl  "go_shopmarket/products/handler"
 
 
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -42,6 +43,7 @@ func main() {
 	app.Post("/login", loginHandler.Login_Service)
 	app.Post("/register", userHandler.Register_Service)
 	app.Post("/products", productHandler.CreateProduct)
+	app.Get("/products", productHandler.GetAllProducts)
 	log.Fatal(app.Listen(":5000"))
 
 }
