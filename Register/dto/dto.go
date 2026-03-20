@@ -1,4 +1,4 @@
-package register
+package dto
 
 type RegisterRequest struct {
         Username string `json:"username"`

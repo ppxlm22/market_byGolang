@@ -1,24 +1,19 @@
-package register
+package service
 
 import (
 	"errors"
 	"golang.org/x/crypto/bcrypt"
+	"go_shopmarket/register/dto"
+	"go_shopmarket/register/repository"
 )
-type Service interface {
-	RegisterUser(req registerDB) error
-}
 
-type service struct {
-	repo Repository
-}
-
-func NewService(r Repository) Service {
+func NewService(r repository.Repository) Service {
 	return &service{
 		repo: r,
 	}
 }
 
-func (s *service) RegisterUser(req registerDB) error {
+func (s *service) RegisterUser(req dto.RegisterRequest) error {
 
 	if req.Password == "" {
 		return errors.New("กรุณากรอกรหัสผ่าน")

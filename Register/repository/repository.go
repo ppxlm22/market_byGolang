@@ -1,12 +1,10 @@
-package register
+package repository
 
-import "go_shopmarket/database"
+import (
+	"go_shopmarket/database"
+	"go_shopmarket/register/dto"
+)
 
-type Repository interface {
-	CheckUserExists(username, email string) (bool, error)
-	Register(req registerDB) error
-
-}
 type repository struct{}
 
 func NewRepository() Repository {
@@ -24,7 +22,7 @@ func (r *repository) CheckUserExists(username string, email string) (bool, error
 	return exists, nil 
 }
 
-func (r *repository) Register(req registerDB) error {
+func (r *repository) Register(req dto.RegisterRequest) error {
 	query := `INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3)`
 
 	_, err := database.DB.Exec(query, req.Username, req.Email, req.Password)
