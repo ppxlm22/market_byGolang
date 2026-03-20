@@ -30,3 +30,11 @@ func (s *service) GetAllProducts() ([]dto.Products, error) {
 	}
 	return product, nil
 }	
+func (s *service) GetProductByID(id int) (dto.Products, error) {
+	product, err := s.repo.GetProductByID(id)	
+	if err != nil {
+		return dto.Products{}, err
+	}
+	return product, nil
+}
+

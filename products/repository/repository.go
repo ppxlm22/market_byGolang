@@ -27,7 +27,6 @@ func (r *repository) GetAllProducts() ([]dto.Products, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	defer rows.Close()
 
 	for rows.Next() {
@@ -40,4 +39,13 @@ func (r *repository) GetAllProducts() ([]dto.Products, error) {
 	}
 
 	return products, nil
+}
+func (r *repository) GetProductByID(id int) (dto.Products, error) {
+	var product dto.Products
+	query := `SELECT id, name, price, stock, category_id FROM products WHERE id = $1`
+	err := database.DB.QueryRow(query, id).Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.CategoryID)
+	if err != nil {
+		return dto.Products{}, err
+	}
+	return product, nil
 }
