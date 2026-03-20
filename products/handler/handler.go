@@ -78,3 +78,19 @@ func (h *Handler) UpdateProduct(c *fiber.Ctx) error {
 		"message": "อัพเดตสินค้าสำเร็จ",
 	})
 }
+func (h *Handler) DeleteProduct(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "ID ต้องเป็นตัวเลข",
+		})
+	}
+	if err := h.service.DeleteProduct(id); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "ลบสินค้าสำเร็จ",
+	})
+}

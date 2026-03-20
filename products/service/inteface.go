@@ -9,4 +9,5 @@ type Service interface {
 	GetAllProducts() ([]dto.Products, error)
 	GetProductByID(id int) (dto.Products, error)
 	UpdateProduct(id int, product dto.Products) error
+	DeleteProduct(id int) error
 }

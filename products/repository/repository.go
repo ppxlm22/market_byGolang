@@ -57,3 +57,11 @@ func (r *repository) UpdateProduct(id int, product dto.Products) error {
 	}
 	return nil
 }
+func (r *repository) DeleteProduct(id int) error {
+	query := `DELETE FROM public.products WHERE id = $1`
+	_, err := database.DB.Exec(query, id)	
+	if err != nil {
+		return err
+	}	
+	return nil
+}
