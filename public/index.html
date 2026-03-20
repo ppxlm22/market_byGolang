@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopMarket</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">◈</span>
+            <span class="logo-text">ShopMarket</span>
+        </div>
+        <div class="nav-links">
+            <span id="userGreeting" class="user-greeting hidden"></span>
+            <button id="loginBtn" class="btn-ghost">เข้าสู่ระบบ</button>
+            <button id="registerBtn" class="btn-outline">สมัครสมาชิก</button>
+            <button id="logoutBtn" class="btn-ghost hidden">ออกจากระบบ</button>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="container">
+        <div class="header-section">
+            <h1 class="page-title">สินค้าทั้งหมด</h1>
+            <span id="productCount" class="product-count">0 รายการ</span>
+        </div>
+
+        <!-- Filter/Sort Bar -->
+        <div class="filter-bar">
+            <div class="search-group">
+                <span class="search-icon">⌕</span>
+                <input type="text" id="searchInput" placeholder="ค้นหาสินค้า..." class="search-input">
+            </div>
+            <div class="sort-group">
+                <select id="sortSelect" class="sort-select">
+                    <option value="">เรียงโดย: ค่าเริ่มต้น</option>
+                    <option value="price_asc">ราคา: น้อย → มาก</option>
+                    <option value="price_desc">ราคา: มาก → น้อย</option>
+                    <option value="name_asc">ชื่อ: A → Z</option>
+                </select>
+                <button id="addProductBtn" class="btn-primary">
+                    <span>＋</span> เพิ่มสินค้า
+                </button>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="product-list" class="product-grid">
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>กำลังโหลดสินค้า...</p>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state hidden">
+            <div class="empty-icon">◫</div>
+            <h3>ยังไม่มีสินค้า</h3>
+            <p>เริ่มเพิ่มสินค้าชิ้นแรกของคุณได้เลย</p>
+            <button class="btn-primary" onclick="openModal('addProductModal')">＋ เพิ่มสินค้า</button>
+        </div>
+    </main>
+
+    <!-- ===== MODAL: LOGIN ===== -->
+    <div id="loginModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('loginModal')" aria-label="ปิด">✕</button>
+            <div class="modal-header">
+                <div class="modal-icon">◈</div>
+                <h2>เข้าสู่ระบบ</h2>
+            </div>
+            <form id="loginForm" novalidate>
+                <div class="field-group">
+                    <label for="loginUsername">ชื่อผู้ใช้</label>
+                    <input type="text" id="loginUsername" name="username" placeholder="กรอกชื่อผู้ใช้" autocomplete="username" required>
+                </div>
+                <div class="field-group">
+                    <label for="loginPassword">รหัสผ่าน</label>
+                    <input type="password" id="loginPassword" name="password" placeholder="กรอกรหัสผ่าน" autocomplete="current-password" required>
+                </div>
+                <div id="loginError" class="form-error hidden"></div>
+                <button type="submit" class="btn-primary btn-block" id="loginSubmitBtn">
+                    <span class="btn-text">เข้าสู่ระบบ</span>
+                    <span class="btn-loader hidden">⟳</span>
+                </button>
+            </form>
+            <p class="modal-footer-text">ยังไม่มีบัญชี? <a href="#" onclick="switchModal('loginModal','registerModal')">สมัครสมาชิก</a></p>
+        </div>
+    </div>
+
+    <!-- ===== MODAL: REGISTER ===== -->
+    <div id="registerModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('registerModal')" aria-label="ปิด">✕</button>
+            <div class="modal-header">
+                <div class="modal-icon">◈</div>
+                <h2>สมัครสมาชิก</h2>
+            </div>
+            <form id="registerForm" novalidate>
+                <div class="field-group">
+                    <label for="regUsername">ชื่อผู้ใช้</label>
+                    <input type="text" id="regUsername" name="username" placeholder="ตั้งชื่อผู้ใช้" autocomplete="username" required>
+                </div>
+                <div class="field-group">
+                    <label for="regEmail">อีเมล</label>
+                    <input type="email" id="regEmail" name="email" placeholder="กรอกอีเมล" autocomplete="email">
+                </div>
+                <div class="field-group">
+                    <label for="regPassword">รหัสผ่าน</label>
+                    <input type="password" id="regPassword" name="password" placeholder="ตั้งรหัสผ่าน (อย่างน้อย 6 ตัว)" autocomplete="new-password" required>
+                </div>
+                <div class="field-group">
+                    <label for="regConfirmPassword">ยืนยันรหัสผ่าน</label>
+                    <input type="password" id="regConfirmPassword" name="confirmPassword" placeholder="กรอกรหัสผ่านอีกครั้ง" autocomplete="new-password" required>
+                </div>
+                <div id="registerError" class="form-error hidden"></div>
+                <button type="submit" class="btn-primary btn-block" id="registerSubmitBtn">
+                    <span class="btn-text">สมัครสมาชิก</span>
+                    <span class="btn-loader hidden">⟳</span>
+                </button>
+            </form>
+            <p class="modal-footer-text">มีบัญชีแล้ว? <a href="#" onclick="switchModal('registerModal','loginModal')">เข้าสู่ระบบ</a></p>
+        </div>
+    </div>
+
+    <!-- ===== MODAL: ADD/EDIT PRODUCT ===== -->
+    <div id="addProductModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-box modal-box-wide">
+            <button class="modal-close" onclick="closeModal('addProductModal')" aria-label="ปิด">✕</button>
+            <div class="modal-header">
+                <div class="modal-icon">◫</div>
+                <h2 id="productModalTitle">เพิ่มสินค้าใหม่</h2>
+            </div>
+            <form id="productForm" novalidate>
+                <input type="hidden" id="productId">
+                <div class="field-row">
+                    <div class="field-group">
+                        <label for="productName">ชื่อสินค้า <span class="required">*</span></label>
+                        <input type="text" id="productName" placeholder="ชื่อสินค้า" required>
+                    </div>
+                    <div class="field-group">
+                        <label for="productPrice">ราคา (บาท) <span class="required">*</span></label>
+                        <input type="number" id="productPrice" placeholder="0.00" min="0" step="0.01" required>
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label for="productCategory">หมวดหมู่</label>
+                        <input type="text" id="productCategory" placeholder="เช่น อาหาร, เครื่องดื่ม">
+                    </div>
+                    <div class="field-group">
+                        <label for="productStock">จำนวนสต็อก</label>
+                        <input type="number" id="productStock" placeholder="0" min="0">
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label for="productDescription">รายละเอียด</label>
+                    <textarea id="productDescription" placeholder="รายละเอียดสินค้า..." rows="3"></textarea>
+                </div>
+                <div class="field-group">
+                    <label for="productImage">URL รูปภาพ</label>
+                    <input type="url" id="productImage" placeholder="https://example.com/image.jpg">
+                </div>
+                <div id="productError" class="form-error hidden"></div>
+                <div class="form-actions">
+                    <button type="button" class="btn-ghost" onclick="closeModal('addProductModal')">ยกเลิก</button>
+                    <button type="submit" class="btn-primary" id="productSubmitBtn">
+                        <span class="btn-text">บันทึกสินค้า</span>
+                        <span class="btn-loader hidden">⟳</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== MODAL: DELETE CONFIRM ===== -->
+    <div id="deleteModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-box modal-box-sm">
+            <div class="modal-header">
+                <div class="modal-icon modal-icon-danger">⚠</div>
+                <h2>ยืนยันการลบ</h2>
+            </div>
+            <p class="confirm-text">คุณแน่ใจหรือไม่ว่าต้องการลบสินค้านี้? การกระทำนี้ไม่สามารถย้อนกลับได้</p>
+            <input type="hidden" id="deleteProductId">
+            <div class="form-actions">
+                <button class="btn-ghost" onclick="closeModal('deleteModal')">ยกเลิก</button>
+                <button class="btn-danger" id="confirmDeleteBtn">ลบสินค้า</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TOAST NOTIFICATION ===== -->
+    <div id="toast" class="toast hidden" role="alert" aria-live="polite"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
