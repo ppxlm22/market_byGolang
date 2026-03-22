@@ -1,4 +1,4 @@
-package service 
+package service
 
 import (
 	"errors"
@@ -29,9 +29,9 @@ func (s *service) GetAllProducts() ([]dto.Products, error) {
 		return nil, errors.New("ไม่พบสินค้า")
 	}
 	return product, nil
-}	
+}
 func (s *service) GetProductByID(id int) (dto.Products, error) {
-	product, err := s.repo.GetProductByID(id)	
+	product, err := s.repo.GetProductByID(id)
 	if err != nil {
 		return dto.Products{}, err
 	}
@@ -53,4 +53,18 @@ func (s *service) DeleteProduct(id int) error {
 		return errors.New("ไม่พบสินค้าที่ต้องการลบ")
 	}
 	return s.repo.DeleteProduct(id)
+}
+func (s *service) GetCategoryByID(id int) (string, error) {
+	category, err := s.repo.GetCategoryByID(id)
+	if err != nil {
+		return "", err
+	}
+	return category, nil
+}
+func (s *service) GetAllCategories() ([]dto.Category, error) {
+	categories, err := s.repo.GetAllCategories()
+	if err != nil {
+		return nil, err
+	}
+	return categories, nil
 }

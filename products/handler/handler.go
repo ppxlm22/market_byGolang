@@ -94,3 +94,31 @@ func (h *Handler) DeleteProduct(c *fiber.Ctx) error {
 		"message": "ลบสินค้าสำเร็จ",
 	})
 }
+func (h *Handler) GetCategoryByID(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "ID ต้องเป็นตัวเลข",
+		})
+	}
+	category, err := h.service.GetCategoryByID(id)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"category": category,
+	})
+}
+func (h *Handler) GetAllCategories(c *fiber.Ctx) error {
+	categories, err := h.service.GetAllCategories()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"categories": categories,
+	})
+}

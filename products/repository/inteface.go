@@ -9,5 +9,7 @@ type Repository interface {
 	GetProductByID(id int) (dto.Products, error)
 	UpdateProduct(id int, product dto.Products) error
 	DeleteProduct(id int) error
+	GetCategoryByID(id int) (string, error)
+	GetAllCategories() ([]dto.Category, error)
 
 }

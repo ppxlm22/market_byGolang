@@ -1,6 +1,7 @@
 package main
 
 import (
+	 "github.com/gofiber/fiber/v2/middleware/cors"
 	"go_shopmarket/config"
 	
 	"log"
@@ -23,8 +24,10 @@ import (
 )
 
 func main() {
+	
 	_ = config.LoadConfig()
 	database.ConnectDB()
+
 
 	userRepo := register.NewRepository()      
 	userService := registerSvc.NewService(userRepo)
@@ -39,14 +42,21 @@ func main() {
 	productHandler := productHdl.NewHandler(productService)
 
 	app := fiber.New()
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+		AllowMethods: "GET,POST,PUT,DELETE",
+	}))
 
 	app.Post("/login", loginHandler.Login_Service)
 	app.Post("/register", userHandler.Register_Service)
 	app.Post("/products", middleware.Protected(),middleware.AdminOnly(), productHandler.CreateProduct)
 	app.Get("/products", productHandler.GetAllProducts)
-	app.Get("/product/:id", productHandler.GetProductByID)
-	app.Put("/product/:id", middleware.Protected(),middleware.AdminOnly(), productHandler.UpdateProduct)
-	app.Delete("/product/:id", middleware.Protected(),middleware.AdminOnly(), productHandler.DeleteProduct)
-	log.Fatal(app.Listen(":5000"))
+	app.Get("/products/:id", productHandler.GetProductByID)
+	app.Put("/products/:id", middleware.Protected(),middleware.AdminOnly(), productHandler.UpdateProduct)
+	app.Delete("/products/:id", middleware.Protected(),middleware.AdminOnly(), productHandler.DeleteProduct)
+	app.Get("/categories/:id", productHandler.GetCategoryByID)
+	app.Get("/categories", productHandler.GetAllCategories)
+	app.Static("/", "./public")
+	log.Fatal(app.Listen(":5080"))
 
 }

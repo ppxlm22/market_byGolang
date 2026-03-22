@@ -5,14 +5,15 @@ import(
 )
 
 type Category struct {
-	ID int
-	Name string
+	ID int `json:"id"`
+	Name string `json:"name"`
 }
 type Products struct {
-	ID int
-	Name string
-	Price float64
-	Stock int
-	CategoryID int
-	Create_at time.Time
+	ID           int     `json:"id"`
+	Name         string  `json:"name"`
+	Price        float64 `json:"price"`
+	Stock        int     `json:"stock"`
+	CategoryID   int     `json:"category_id"`
+	UpdatedAt    *time.Time `json:"updated_at"`
+	CategoryName string  `json:"category"`
 }
