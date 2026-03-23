@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"strings"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -16,7 +17,8 @@ func Protected() fiber.Handler {
 		}
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return []byte("your_secret_key"), nil
+			secret := os.Getenv("JWT_SECRET")
+			return []byte(secret), nil
 		})
 		if 	err != nil || !token.Valid {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
