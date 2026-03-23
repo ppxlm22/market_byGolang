@@ -296,7 +296,6 @@ document.getElementById('confirmDeleteBtn')?.addEventListener('click', async () 
     }
 });
 
-// ... Event Listeners ของ Login/Register คงเดิมเหมือนโค้ดเก่าของคุณอ้นเลยครับ ...
 document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const username = document.getElementById('loginUsername').value.trim();
@@ -309,9 +308,18 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     try {
         await loginUser(username, password);
         closeModal('loginModal');
-        updateNavUI();
-        renderProducts(state.filtered);
-        showToast(`ยินดีต้อนรับ, ${state.user.username}!`, 'success');
+        if (state.user.role === 'customer') {
+            showToast(`ยินดีต้อนรับ, ${state.user.username}! กำลังเข้าสู่ร้านค้า...`, 'success');
+            
+            setTimeout(() => {
+                window.location.href = 'customer/shop.html'; 
+            }, 1000);
+            
+        } else {
+            updateNavUI();
+            renderProducts(state.filtered);
+            showToast(`ยินดีต้อนรับ, ${state.user.username}!`, 'success');
+        }
     } catch (err) {
         showError('loginError', err.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
     } finally { setLoading(btn, false); }
@@ -351,7 +359,7 @@ document.getElementById('registerForm')?.addEventListener('submit', async (e) =>
         showError('registerError', err.message || 'ไม่สามารถสมัครสมาชิกได้');
     } finally {
         setLoading(btn, false);
-    }
+    }ป
 });
 
 document.getElementById('logoutBtn')?.addEventListener('click', async () => {
