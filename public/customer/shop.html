@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopMarket — ร้านค้า</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shop.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="index.html" class="logo-link">
+                <span class="logo-icon">◈</span>
+                <span class="logo-text">ShopMarket</span>
+            </a>
+        </div>
+        <div class="nav-center">
+            <div class="search-wrap">
+                <span class="search-icon">⌕</span>
+                <input type="text" id="searchInput" placeholder="ค้นหาสินค้า..." class="search-input">
+            </div>
+        </div>
+        <div class="nav-right" style="display: flex; align-items: center; gap: 15px;">
+            
+            <button id="logoutBtn" class="btn-ghost">ออกจากระบบ</button>
+            
+            <button class="cart-toggle" id="cartToggle" aria-label="ตะกร้าสินค้า">
+                <span class="cart-icon">🛒</span>
+                <span class="cart-badge hidden" id="cartBadge">0</span>
+            </button>
+            
+        </div>
+        
+    </nav>
+
+    <!-- LAYOUT -->
+    <div class="layout">
+
+        <!-- MAIN: Product Grid -->
+        <main class="main-content" id="mainContent">
+            <div class="page-header">
+                <h1 class="page-title">สินค้าทั้งหมด</h1>
+                <div class="header-controls">
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="">หมวดหมู่ทั้งหมด</option>
+                    </select>
+                    <select id="sortSelect" class="filter-select">
+                        <option value="">เรียงโดย: ค่าเริ่มต้น</option>
+                        <option value="price_asc">ราคา: น้อย → มาก</option>
+                        <option value="price_desc">ราคา: มาก → น้อย</option>
+                        <option value="name_asc">ชื่อ: A → Z</option>
+                    </select>
+                    <span id="productCount" class="product-count">0 รายการ</span>
+                </div>
+            </div>
+
+            <div id="product-list" class="product-grid">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>กำลังโหลดสินค้า...</p>
+                </div>
+            </div>
+
+            <div id="emptyState" class="empty-state hidden">
+                <div class="empty-icon">◫</div>
+                <h3>ไม่พบสินค้า</h3>
+                <p>ลองค้นหาด้วยคำอื่น หรือเลือกหมวดหมู่ใหม่</p>
+            </div>
+        </main>
+
+        <!-- SIDEBAR: Cart -->
+        <aside class="cart-sidebar" id="cartSidebar">
+            <div class="cart-header">
+                <h2 class="cart-title">
+                    <span>🛒</span> ตะกร้าของฉัน
+                </h2>
+                <button class="cart-close" id="cartClose" aria-label="ปิด">✕</button>
+            </div>
+
+            <div class="cart-body" id="cartBody">
+                <div class="cart-empty" id="cartEmpty">
+                    <div class="cart-empty-icon">🛒</div>
+                    <p>ตะกร้าว่างเปล่า</p>
+                    <span>เพิ่มสินค้าเพื่อเริ่มช้อปปิ้ง</span>
+                </div>
+                <div id="cartItems" class="cart-items hidden"></div>
+            </div>
+
+            <div class="cart-footer" id="cartFooter">
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>จำนวนสินค้า</span>
+                        <span id="totalQty">0 ชิ้น</span>
+                    </div>
+                    <div class="summary-row summary-total">
+                        <span>รวมทั้งหมด</span>
+                        <span id="totalPrice" class="total-price">฿0</span>
+                    </div>
+                </div>
+                <button class="btn-checkout" id="checkoutBtn" disabled>
+                    <span class="checkout-text">ชำระเงิน</span>
+                    <span class="checkout-loader hidden">⟳</span>
+                </button>
+                <button class="btn-clear" id="clearCartBtn">ล้างตะกร้า</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- MODAL: Checkout Success -->
+    <div id="successModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="success-icon">✓</div>
+            <h2>ชำระเงินสำเร็จ!</h2>
+            <p id="successMessage">ขอบคุณที่ใช้บริการ ShopMarket</p>
+            <div id="orderSummary" class="order-summary"></div>
+            <button class="btn-primary btn-block" onclick="closeModal('successModal')">กลับสู่หน้าร้านค้า</button>
+        </div>
+    </div>
+
+    <!-- MODAL: Checkout Confirm -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-box modal-box-sm">
+            <div class="modal-header">
+                <div class="modal-icon">◈</div>
+                <h2>ยืนยันการชำระเงิน</h2>
+            </div>
+            <div id="confirmSummary" class="confirm-summary"></div>
+            <div class="form-actions">
+                <button class="btn-ghost" onclick="closeModal('confirmModal')">ยกเลิก</button>
+                <button class="btn-primary" id="confirmPayBtn">ยืนยันชำระ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast hidden" role="alert"></div>
+
+    <script src="shop.js"></script>
+</body>
+</html>
