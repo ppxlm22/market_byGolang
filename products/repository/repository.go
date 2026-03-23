@@ -73,7 +73,7 @@ func (r *repository) UpdateProduct(id int, product dto.Products) error {
 func (r *repository) DeductProductStock(id int, quantity int) error {
 	query := `UPDATE public.products 
         SET stock = stock - $1, 
-            updated_at = CURRENT_TIMESTAMP 
+            update_at = CURRENT_TIMESTAMP 
         WHERE id = $2 AND stock >= $1`
 	result, err := database.DB.Exec(query, quantity, id)
 	if err != nil {

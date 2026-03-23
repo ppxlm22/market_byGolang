@@ -14,7 +14,7 @@ type Products struct {
 	Price        float64 `json:"price"`
 	Stock        int     `json:"stock"`
 	CategoryID   int     `json:"category_id"`
-	UpdatedAt    *time.Time `json:"updated_at"`
+	UpdatedAt    *time.Time `json:"update_at"`
 	CategoryName string  `json:"category"`
 }
 
