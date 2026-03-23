@@ -5,7 +5,7 @@ import (
 )
 
 type Service interface {
-	LoginUser(req dto.LoginRequest) (string, error)
+	LoginUser(req dto.LoginRequest) (string, dto.UserResponse, error)
 }
 type service struct {
 	repo repository.Repository

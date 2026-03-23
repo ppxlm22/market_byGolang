@@ -2,21 +2,23 @@ package repository
 
 import (
 	"go_shopmarket/database"
+	"go_shopmarket/login/dto"
 )
+
 type repository struct{}
-func NewRepository() Repository{
+
+func NewRepository() Repository {
 	return &repository{}
 }
 
-func (r *repository) GetUserByUsername(username string) (int, string, string, error) {
-	var id int
+func (r *repository) GetUserByUsername(username string) (dto.UserResponse, string, error) {
+	var user dto.UserResponse
 	var passwordHash string
-	var role string
 
-	query := `SELECT id, password_hash, role FROM users WHERE username = $1`
-	err := database.DB.QueryRow(query, username).Scan(&id, &passwordHash, &role)
+	query := `SELECT id, username, password_hash, role FROM users WHERE username = $1`
+	err := database.DB.QueryRow(query, username).Scan(&user.ID, &user.Username, &passwordHash, &user.Role)
 	if err != nil {
-		return 0, "", "", err
+		return dto.UserResponse{}, "", err
 	}
-	return id, passwordHash, role, nil
+	return user, passwordHash, nil
 }

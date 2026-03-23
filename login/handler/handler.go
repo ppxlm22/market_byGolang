@@ -25,7 +25,7 @@ func (h *Handler) Login_Service(c *fiber.Ctx) error {
 			"error": "กรุณากรอกชื่อผู้ใช้และรหัสผ่าน",
 		})
 	}
-	token, err := h.service.LoginUser(req)
+	token, user, err := h.service.LoginUser(req)
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": err.Error(),
@@ -33,6 +33,7 @@ func (h *Handler) Login_Service(c *fiber.Ctx) error {
 	}
 	res := dto.LoginResponse{
 		Token: token,
+		User:  user,
 	}
 	return c.Status(fiber.StatusOK).JSON(res)
 }
