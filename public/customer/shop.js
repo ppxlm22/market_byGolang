@@ -10,18 +10,39 @@ const API = {
 
 let state = {
     products: [],
-    filtered: [],
-    cart: {}       
-};
+    filtered: [],  
+    cart: {}
+}; 
 
 async function request(method, endpoint, body = null) {
     const url = API.BASE_URL + endpoint;
     const headers = { 'Content-Type': 'application/json' };
 
+    const savedUser = localStorage.getItem('sm_user');
+    if (savedUser) {
+        try {
+            const user = JSON.parse(savedUser);
+
+            if (user && user.token) {
+                headers['Authorization'] = `Bearer ${user.token}`;
+            }
+        } catch (e) {
+            console.error("Error parsing user data:", e);
+        }
+    }
+
     const opts = { method, headers };
     if (body) opts.body = JSON.stringify(body);
 
     const res = await fetch(url, opts);
+    
+    if (res.status === 401) {
+        localStorage.removeItem('sm_user'); 
+        alert('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่');
+        window.location.href = '../index.html'; 
+        return;
+    }
+
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
@@ -394,7 +415,37 @@ function init() {
 
     // Checkout
     document.getElementById('checkoutBtn')?.addEventListener('click', openCheckoutConfirm);
-    document.getElementById('confirmPayBtn')?.addEventListener('click', checkout);
+    document.getElementById('confirmPayBtn')?.addEventListener('click', async () => {
+        const btn = document.getElementById('confirmPayBtn');
+        if (getTotalQty() === 0) {
+            showToast('ไม่มีสินค้าในตะกร้า', 'error');
+            return;
+        }
+        btn.textContent = 'กำลังประมวลผล...';
+        btn.disabled = true;
+        try {
+            const payload = {
+                    items: Object.entries(state.cart).map(([id, qty]) => {
+                        return {
+                            product_id: parseInt(id), 
+                            quantity:   qty           
+                            };
+                        })
+                    };
+            const data = await request('POST', '/checkout', payload);
+            closeModal('confirmModal');    
+
+            updateCartUI();                    
+            openModal('successModal');         
+            await fetchProducts();            
+
+        } catch (err) {
+            showToast(err.message || 'เกิดข้อผิดพลาดในการชำระเงิน', 'error');
+        } finally {
+            btn.textContent = 'ยืนยันชำระ';
+            btn.disabled = false;
+        }
+    });
     document.getElementById('clearCartBtn')?.addEventListener('click', () => {
         if (getTotalQty() === 0) return;
         clearCart();
