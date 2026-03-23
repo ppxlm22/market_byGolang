@@ -152,21 +152,16 @@
                 <div class="field-row">
                     <div class="field-group">
                         <label for="productCategory">หมวดหมู่</label>
-                        <input type="text" id="productCategory" placeholder="เช่น อาหาร, เครื่องดื่ม">
-                    </div>
+                        <select id="productCategory" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+                            <option value="" disabled selected>-- กำลังโหลดหมวดหมู่... --</option>
+                        </select>
+                    </div>  
                     <div class="field-group">
                         <label for="productStock">จำนวนสต็อก</label>
                         <input type="number" id="productStock" placeholder="0" min="0">
                     </div>
                 </div>
-                <div class="field-group">
-                    <label for="productDescription">รายละเอียด</label>
-                    <textarea id="productDescription" placeholder="รายละเอียดสินค้า..." rows="3"></textarea>
-                </div>
-                <div class="field-group">
-                    <label for="productImage">URL รูปภาพ</label>
-                    <input type="url" id="productImage" placeholder="https://example.com/image.jpg">
-                </div>
+
                 <div id="productError" class="form-error hidden"></div>
                 <div class="form-actions">
                     <button type="button" class="btn-ghost" onclick="closeModal('addProductModal')">ยกเลิก</button>
