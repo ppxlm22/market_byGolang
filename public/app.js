@@ -5,7 +5,7 @@ const API = {
         REGISTER: '/register',
         PRODUCTS: '/products',
         CATEGORIES: '/categories', 
-        PRODUCT:  (id) => `/product/${id}` 
+        PRODUCT:  (id) => `/products/${id}` 
     }
 };
 
@@ -74,12 +74,12 @@ async function deleteProduct(id) {
     await fetchProducts(); // โหลดข้อมูลใหม่หลังจากลบเสร็จ
 }
 
-// ... ฟังก์ชัน Login / Register เหมือนเดิม ...
 async function loginUser(username, password) {
     const data = await request('POST', API.ENDPOINTS.LOGIN, { username, password });
     state.user = {
         id:       data.user?.id || data.id,
         username: data.user?.username || data.username || username,
+        role:     data.user?.role || data.role || 'User',
         token:    data.token || data.accessToken
     };
     localStorage.setItem('sm_user', JSON.stringify(state.user));
@@ -92,6 +92,7 @@ async function registerUser(username, email, password) {
         state.user = {
             id:       data.user?.id || data.id,
             username: data.user?.username || data.username || username,
+            role:     data.user?.role || data.role || 'User',
             token:    data.token || data.accessToken
         };
         localStorage.setItem('sm_user', JSON.stringify(state.user));
@@ -167,7 +168,7 @@ function updateNavUI() {
         if(logoutBtn) logoutBtn.classList.remove('hidden');
         if(greeting) {
             greeting.classList.remove('hidden');
-            greeting.textContent = `สวัสดี, ${state.user.username}`;
+            greeting.textContent = `${state.user.role}`;
         }
         if(addBtn) addBtn.style.display = '';
     } else {
@@ -314,6 +315,43 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     } catch (err) {
         showError('loginError', err.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
     } finally { setLoading(btn, false); }
+});
+document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const username  = document.getElementById('regUsername').value.trim();
+    const email     = document.getElementById('regEmail').value.trim();
+    const password  = document.getElementById('regPassword').value;
+    const confirm   = document.getElementById('regConfirmPassword').value;
+    const btn       = document.getElementById('registerSubmitBtn');
+
+    if (!username || !password || !email) {
+        showError('registerError', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+        return;
+    }
+    
+    if (password !== confirm) {
+        showError('registerError', 'รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน');
+        return;
+    }
+
+    hideError('registerError');
+    setLoading(btn, true);
+
+    try {
+        await registerUser(username, email, password);
+        
+        closeModal('registerModal');
+        updateNavUI();
+        showToast('สมัครสมาชิกเรียบร้อย!', 'success');
+        
+        if (!state.user) openModal('loginModal'); 
+        
+    } catch (err) {
+        showError('registerError', err.message || 'ไม่สามารถสมัครสมาชิกได้');
+    } finally {
+        setLoading(btn, false);
+    }
 });
 
 document.getElementById('logoutBtn')?.addEventListener('click', async () => {
