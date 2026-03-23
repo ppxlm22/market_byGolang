@@ -12,4 +12,5 @@ type Service interface {
 	DeleteProduct(id int) error
 	GetCategoryByID(id int) (string, error)
 	GetAllCategories() ([]dto.Category, error)
+	Checkout(req dto.CheckoutRequest) error
 }

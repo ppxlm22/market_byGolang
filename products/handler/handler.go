@@ -122,3 +122,24 @@ func (h *Handler) GetAllCategories(c *fiber.Ctx) error {
 		"categories": categories,
 	})
 }
+func (h *Handler) Checkout_service(c *fiber.Ctx) error {
+	var req dto.CheckoutRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "ข้อมูลไม่ถูกต้อง",
+		})
+	}
+	if len(req.Items) == 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "ไม่มีสินค้าในตะกร้า",
+		})
+	}
+	if err := h.service.Checkout(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "ชำระเงินสำเร็จ",
+	})
+}

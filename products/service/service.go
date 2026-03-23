@@ -68,3 +68,15 @@ func (s *service) GetAllCategories() ([]dto.Category, error) {
 	}
 	return categories, nil
 }
+func (s *service) Checkout(req dto.CheckoutRequest) error {
+	if len(req.Items) == 0 {	
+		return errors.New("ไม่มีสินค้าในคำสั่งซื้อ")
+	}
+	for _, item := range req.Items {
+		err := s.repo.DeductProductStock(item.ProductID, item.Quantity)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}

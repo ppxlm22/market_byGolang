@@ -56,6 +56,7 @@ func main() {
 	app.Delete("/products/:id", middleware.Protected(),middleware.AdminOnly(), productHandler.DeleteProduct)
 	app.Get("/categories/:id", productHandler.GetCategoryByID)
 	app.Get("/categories", productHandler.GetAllCategories)
+	app.Post("/checkout",middleware.Protected(), productHandler.Checkout_service)
 	app.Static("/", "./public")
 	log.Fatal(app.Listen(":5080"))
 
