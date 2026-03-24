@@ -15,13 +15,7 @@ Project Structure
     cd market_byGolang
 2.Install Dependencies
     go mod tidy
-3.สร้างไฟล์ .env 
-    DB_HOST=localhost
-    DB_PORT=5432
-    DB_USER=myuser      
-    DB_PASSWORD=mypassword 
-    DB_NAME=mydatabase  
-    JWT_SECRET=victoriaSecretKey_12345
+3. ไฟล์.env ใช้ตาม .env.example
 4.รันคำสั่ง
     docker-compose up -d
 5.รันคำสั่ง
