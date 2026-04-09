@@ -5,7 +5,7 @@ import (
 )
 
 type Service interface {
-	RegisterUser(req dto.RegisterRequest) error
+	RegisterUser(req dto.RegisterRequest) (*dto.RegisterRespone, error)
 }
 
 type service struct {

@@ -26,10 +26,11 @@ import (
 func main() {
 	
 	_ = config.LoadConfig()
-	database.ConnectDB()
 
+	DB := database.ConnectDB()
+	// MysqlDB := database.ConnectMysql()
 
-	userRepo := register.NewRepository()      
+	userRepo := register.NewRepository(DB)
 	userService := registerSvc.NewService(userRepo)
 	userHandler := registerHdl.NewHandler(userService)
 

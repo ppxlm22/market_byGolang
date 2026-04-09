@@ -25,11 +25,11 @@ func (h *Handler) Register_Service(c *fiber.Ctx) error {
 		Email:    req.Email,
 		Password: req.Password,
 	}
-	err := h.service.RegisterUser(reqDB)
+	Userrespone, err := h.service.RegisterUser(reqDB)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "สมัครสมาชิกสำเร็จ"})
+	return c.Status(fiber.StatusCreated).JSON(Userrespone)
 
 }	

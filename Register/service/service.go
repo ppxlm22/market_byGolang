@@ -13,24 +13,28 @@ func NewService(r repository.Repository) Service {
 	}
 }
 
-func (s *service) RegisterUser(req dto.RegisterRequest) error {
+func (s *service) RegisterUser(req dto.RegisterRequest) (*dto.RegisterRespone, error) {
 
 	if req.Password == "" {
-		return errors.New("กรุณากรอกรหัสผ่าน")
+		return nil, errors.New("กรุณากรอกรหัสผ่าน")
 	}
 	isDuplicate, err := s.repo.CheckUserExists(req.Username, req.Email)
 	if isDuplicate {
-		return errors.New("Username หรือ Email นี้มีผู้ใช้งานแล้ว")
+		return nil, errors.New("Username หรือ Email นี้มีผู้ใช้งานแล้ว")
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
 	if err != nil {
-		return errors.New("เกิดข้อผิดพลาดในการเข้ารหัสรหัสผ่าน")
+		return nil, errors.New("เกิดข้อผิดพลาดในการเข้ารหัสรหัสผ่าน")
 	}
 	req.Password = string(hashedPassword)
 
-	err = s.repo.Register(req)
+	user, err := s.repo.Register(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &dto.RegisterRespone{
+		Username: user.Username,
+		Email: user.Email,
+		Message: "success",
+	}, nil
 }

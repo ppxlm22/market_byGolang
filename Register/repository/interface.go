@@ -5,6 +5,6 @@ import (
 
 type Repository interface {
 	CheckUserExists(username, email string) (bool, error)
-	Register(req dto.RegisterRequest) error
+	Register(req dto.RegisterRequest) (*dto.RegisterDB, error)
 
 }
