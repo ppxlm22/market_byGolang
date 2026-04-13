@@ -10,16 +10,16 @@ type RegisterDB struct {
         Email    string
         Password string
 }
-type RegisterRespone struct {
+type RegisterResponse struct {
 	Username string
         Email    string
         Message string
        
 }
-func (regDB *RegisterDB)ToModel() *RegisterRespone {
- return &RegisterRespone{
-        Email: regDB.Email,
-	Username: regDB.Username,
-	Message: "success",
- } 
+func (regDB *RegisterDB)ToModel() *RegisterResponse {
+        return &RegisterResponse{
+                Email: regDB.Email,
+                Username: regDB.Username,
+                Message: "success",
+        } 
 }

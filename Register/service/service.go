@@ -1,7 +1,7 @@
 package service
 
 import (
-	"errors"
+	"go_shopmarket/apperror"
 	"golang.org/x/crypto/bcrypt"
 	"go_shopmarket/register/dto"
 	"go_shopmarket/register/repository"
@@ -13,18 +13,18 @@ func NewService(r repository.Repository) Service {
 	}
 }
 
-func (s *service) RegisterUser(req dto.RegisterRequest) (*dto.RegisterRespone, error) {
+func (s *service) RegisterUser(req dto.RegisterRequest) (*dto.RegisterResponse, error) {
 
-	if req.Password == "" {
-		return nil, errors.New("กรุณากรอกรหัสผ่าน")
-	}
 	isDuplicate, err := s.repo.CheckUserExists(req.Username, req.Email)
+	if err != nil {
+		return nil, apperror.NewInternal("เกิดข้อผิดพลาดในการตรวจสอบข้อมูลผู้ใช้")
+	}	
 	if isDuplicate {
-		return nil, errors.New("Username หรือ Email นี้มีผู้ใช้งานแล้ว")
+		return nil, apperror.NewConflict("Username หรือ Email นี้มีผู้ใช้งานแล้ว")
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
 	if err != nil {
-		return nil, errors.New("เกิดข้อผิดพลาดในการเข้ารหัสรหัสผ่าน")
+		return nil, apperror.NewInternal("เกิดข้อผิดพลาดในการเข้ารหัสรหัสผ่าน")
 	}
 	req.Password = string(hashedPassword)
 
@@ -32,7 +32,7 @@ func (s *service) RegisterUser(req dto.RegisterRequest) (*dto.RegisterRespone, e
 	if err != nil {
 		return nil, err
 	}
-	return &dto.RegisterRespone{
+	return &dto.RegisterResponse{
 		Username: user.Username,
 		Email: user.Email,
 		Message: "success",

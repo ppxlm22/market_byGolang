@@ -1,7 +1,8 @@
 package main
 
 import (
-	 "github.com/gofiber/fiber/v2/middleware/cors"
+	"go_shopmarket/apperror"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"go_shopmarket/config"
 	
 	"log"
@@ -42,7 +43,26 @@ func main() {
 	productService := productSvc.NewService(productRepo)
 	productHandler := productHdl.NewHandler(productService)
 
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		ErrorHandler: func (c *fiber.Ctx, err error) error  {
+			code := fiber.StatusInternalServerError
+			message := "เกิดข้อผิดพลาดที่เซิฟเวอร์"
+
+			if e, ok := err.(*apperror.AppError); ok {
+				code = e.StatusCode
+				message = e.Message
+			}else if e, ok :=  err.(*fiber.Error); ok {
+				code = e.Code
+				message = e.Message
+			}
+			return c.Status(code).JSON(fiber.Map{
+				"status":"error",
+				"code": code,
+				"message": message,
+			})
+		},
+	})
+
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowMethods: "GET,POST,PUT,DELETE",
