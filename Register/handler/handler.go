@@ -3,7 +3,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go_shopmarket/register/service"
 	"go_shopmarket/register/dto"
+	"go_shopmarket/apperror"
+	"github.com/go-playground/validator/v10"
 )
+
+var validate = validator.New()
 
 func NewHandler(s service.Service) *Handler {
 	return &Handler{
@@ -15,10 +19,10 @@ func (h *Handler) Register_Service(c *fiber.Ctx) error {
 	var req dto.RegisterRequest
 
 	if err := c.BodyParser(&req); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "ข้อมูลไม่ถูกต้อง")
+		return apperror.NewBadRequest("ข้อมูลที่ส่งมาไม่ถูกต้อง")
 	}
-	if req.Username == "" || req.Email == "" || req.Password == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "กรุณากรอกให้ครบ")
+	if err := validate.Struct(req); err != nil {
+		return apperror.NewBadRequest(err.Error())
 	}
 	reqDB := dto.RegisterRequest{
 		Username: req.Username,
@@ -27,7 +31,7 @@ func (h *Handler) Register_Service(c *fiber.Ctx) error {
 	}
 	Userrespone, err := h.service.RegisterUser(reqDB)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		return apperror.NewInternalServerError("เกิดข้อผิดพลาดในการลงทะเบียน")
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(Userrespone)
