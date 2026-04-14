@@ -25,3 +25,6 @@ func NewUnauthorized(message string) error {
 func NewConflict(message string) error {
 	return &AppError{StatusCode: fiber.StatusConflict, Message: message}
 }
+func NewInternalServerError(message string) error {
+	return &AppError{StatusCode: fiber.StatusInternalServerError, Message: message}
+}

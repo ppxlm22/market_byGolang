@@ -3,8 +3,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go_shopmarket/login/service"
 	"go_shopmarket/login/dto"
+	"go_shopmarket/apperror"
+	"github.com/go-playground/validator/v10"
 
 )
+var validate = validator.New()	
 
 func NewHandler(s service.Service) *Handler {
 	return &Handler{
@@ -16,20 +19,14 @@ func (h *Handler) Login_Service(c *fiber.Ctx) error {
 	var req dto.LoginRequest
 
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request body",
-		})
+		return apperror.NewBadRequest("ข้อมูลที่ส่งมาไม่ถูกต้อง")
 	}
-	if req.Username == "" || req.Password == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "กรุณากรอกชื่อผู้ใช้และรหัสผ่าน",
-		})
+	if err := validate.Struct(req); err != nil {
+		return apperror.NewBadRequest(err.Error())
 	}
 	token, user, err := h.service.LoginUser(req)
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		return err
 	}
 	res := dto.LoginResponse{
 		Token: token,
