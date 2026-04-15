@@ -6,14 +6,13 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
+	"go_shopmarket/apperror"
 )
 func Protected() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")	
 		if authHeader == "" {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "ไม่อนุญาตให้เข้าถึง",
-			})
+			return apperror.NewUnauthorized("ไม่อนุญาติให้เข้าถึง")
 		}
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -21,9 +20,7 @@ func Protected() fiber.Handler {
 			return []byte(secret), nil
 		})
 		if 	err != nil || !token.Valid {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "ไม่สามารถยืนยันตัวตนได้",
-			})
+			return apperror.NewUnauthorized("Token ไม่ถูกต้องหรือหมดอายุ")
 		}
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
 			c.Locals("role", claims["role"])
@@ -36,9 +33,7 @@ func AdminOnly() fiber.Handler {
 		role := c.Locals("role")
 
 		if role != "admin" {
-			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-				"error": "สิทธิ์การเข้าถึงถูกปฏิเสธ",
-			})
+			return apperror.NewForbidden("สิทธิ์การเข้าถึงถูกปฏิเสธ")
 		}
 		return c.Next()
 	}
