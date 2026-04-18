@@ -4,7 +4,11 @@ import (
 	"database/sql"
 	"go_shopmarket/database"
 	"go_shopmarket/register/dto"
+	"errors"
 )
+
+var ErrDBQuery = errors.New("database query error")
+var ErrUserAlreadyExists = errors.New("user already exists in database")
 
 type repository struct{
 	DB *sql.DB
@@ -15,6 +19,7 @@ func NewRepository(DB *sql.DB) Repository {
 		DB: DB,
 	}
 }
+//
 func (r *repository) CheckUserExists(username string, email string) (bool, error) {
 	var exists bool
 	
@@ -22,7 +27,7 @@ func (r *repository) CheckUserExists(username string, email string) (bool, error
 	
 	err := r.DB.QueryRow(query, username, email).Scan(&exists)
 	if err != nil {
-		return false, err 
+		return false, ErrDBQuery 
 	}
 	return exists, nil 
 }
@@ -32,7 +37,7 @@ func (r *repository) Register(req dto.RegisterRequest) (*dto.RegisterDB, error) 
 
 	_, err := database.DB.Exec(query, req.Username, req.Email, req.Password)
 	if err != nil {
-		return nil, err
+		return nil, ErrDBQuery
 	}
 	return &dto.RegisterDB{
 		Username: req.Username,
