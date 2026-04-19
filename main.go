@@ -35,11 +35,11 @@ func main() {
 	userService := registerSvc.NewService(userRepo)
 	userHandler := registerHdl.NewHandler(userService)
 
-	loginRepo := loginRepo.NewRepository()
+	loginRepo := loginRepo.NewRepository(DB)
 	loginService := loginSvc.NewService(loginRepo)
 	loginHandler := loginHdl.NewHandler(loginService)
 
-	productRepo := productRepo.NewRepository()
+	productRepo := productRepo.NewRepository(DB)
 	productService := productSvc.NewService(productRepo)
 	productHandler := productHdl.NewHandler(productService)
 
