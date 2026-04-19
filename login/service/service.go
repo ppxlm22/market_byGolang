@@ -1,18 +1,20 @@
 package service
 
 import (
-
+	"errors"
+	"fmt"
 	"time"
 
 	"go_shopmarket/login/dto"
 	"go_shopmarket/login/repository"
-	"go_shopmarket/apperror"
+
+	"log/slog"
+	"os"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
-	"log"
-	"os"
 )
+var ErrInvalidCredentials = errors.New("Username or password is incorrect")
 
 func NewService(r repository.Repository) Service {
 	return &service{
@@ -23,28 +25,38 @@ func NewService(r repository.Repository) Service {
 func (s *service) LoginUser(req dto.LoginRequest) (string, dto.UserResponse, error) {
 	user, hashedPassword, err := s.repo.GetUserByUsername(req.Username)
 	if err != nil {
-		log.Println("Error จาก Database:", err)
-		return "", dto.UserResponse{}, apperror.NewNotFound("ชื่อผู้ใช้ไม่พบ")
+		if errors.Is(err, repository.ErrUserNotFound) {
+			return "", dto.UserResponse{}, ErrInvalidCredentials
+		}
+		return "", dto.UserResponse{}, fmt.Errorf("database error: %w", err)
 	}
-	
-	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(req.Password))
-	if err != nil {
-		log.Println("Error จาก Bcrypt:", err)
-		return "", dto.UserResponse{}, apperror.NewBadRequest("รหัสผ่านไม่ถูกต้อง")
+
+	if err := ComparePassword(hashedPassword, req.Password); err != nil {
+		slog.Warn("Failed login attempt: password mismatch", "username", req.Username)
+		return "", dto.UserResponse{}, ErrInvalidCredentials
 	}
+
 	secretKey := os.Getenv("JWT_SECRET")
-	jwtSecret := []byte(secretKey)
+	if secretKey == "" {
+		return "", dto.UserResponse{}, fmt.Errorf("เกิดข้อผิดพลาดในการสร้างโทเค็น: คีย์ลับไม่ถูกตั้งค่า")
+	}
+
 	claims := jwt.MapClaims{
-		"user_id":  user.ID,	
+		"user_id":  user.ID,
 		"username": user.Username,
 		"role":     user.Role,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(),
+		"exp":      time.Now().Add(time.Hour * 1).Unix(),
 	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	t, err := token.SignedString(jwtSecret)
+	t, err := token.SignedString([]byte(secretKey))
 	if err != nil {
-		return "", dto.UserResponse{}, apperror.NewInternalServerError("เกิดข้อผิดพลาดในการสร้าง token")
+		return "", dto.UserResponse{}, fmt.Errorf("failed to sign token: %w", err)
 	}
-	
+
 	return t, user, nil
+}
+
+func ComparePassword(hashedPassword, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
