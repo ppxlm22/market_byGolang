@@ -77,7 +77,7 @@ func (r *repository) UpdateProduct(id int, product dto.Products) error {
 	}
 	return nil
 }
-func (r *repository) DeductProductStock(id int, quantity int) error {
+func (r *repository) UpdateStock(id int, quantity int) error {
 	query := `UPDATE public.products 
         SET stock = stock - $1, 
         update_at = CURRENT_TIMESTAMP 

@@ -74,7 +74,7 @@ func (s *service) Checkout(req dto.CheckoutRequest) error {
 		return ErrEmptyCart
 	}
 	for _, item := range req.Items {
-		err := s.repo.DeductProductStock(item.ProductID, item.Quantity)
+		err := s.repo.UpdateStock(item.ProductID, item.Quantity)
 		if err != nil {
 			return fmt.Errorf("checkout failed on product_id %d: %w", item.ProductID, err)
 		}
