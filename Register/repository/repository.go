@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"go_shopmarket/database"
 	"go_shopmarket/register/dto"
 	"errors"
 )
@@ -35,7 +34,7 @@ func (r *repository) CheckUserExists(username string, email string) (bool, error
 func (r *repository) Register(req dto.RegisterRequest) (*dto.RegisterDB, error) {
 	query := `INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3)`
 
-	_, err := database.DB.Exec(query, req.Username, req.Email, req.Password)
+	_, err := r.DB.Exec(query, req.Username, req.Email, req.Password)
 	if err != nil {
 		return nil, ErrDBQuery
 	}
