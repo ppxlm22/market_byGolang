@@ -1,27 +1,27 @@
 package main
 
 import (
-	"go_shopmarket/apperror"
-	"github.com/gofiber/fiber/v2/middleware/cors"
+	"errors"
 	"go_shopmarket/config"
-	
-	"log"
+	"log/slog"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"go_shopmarket/database"
-	register "go_shopmarket/register/repository"
-	registerSvc "go_shopmarket/register/service"
-	registerHdl "go_shopmarket/register/handler"
-
-	loginRepo "go_shopmarket/login/repository"
-	loginSvc  "go_shopmarket/login/service"
-	loginHdl  "go_shopmarket/login/handler"
-
-	productRepo "go_shopmarket/products/repository"
-	productSvc  "go_shopmarket/products/service"
-	productHdl  "go_shopmarket/products/handler"
-
-
+	"log"
 	"go_shopmarket/middleware"
 	"github.com/gofiber/fiber/v2"
+
+	registerHdl "go_shopmarket/register/handler"
+	register "go_shopmarket/register/repository"
+	registerSvc "go_shopmarket/register/service"
+
+	loginHdl "go_shopmarket/login/handler"
+	loginRepo "go_shopmarket/login/repository"
+	loginSvc "go_shopmarket/login/service"
+
+	productHdl "go_shopmarket/products/handler"
+	productRepo "go_shopmarket/products/repository"
+	productSvc "go_shopmarket/products/service"
+	
 )
 
 func main() {
@@ -48,21 +48,22 @@ func main() {
 			code := fiber.StatusInternalServerError
 			message := "เกิดข้อผิดพลาดที่เซิฟเวอร์"
 
-			if e, ok := err.(*apperror.AppError); ok {
-				code = e.StatusCode
-				message = e.Message
-			}else if e, ok :=  err.(*fiber.Error); ok {
-				code = e.Code
-				message = e.Message
+			var fiberErr *fiber.Error
+			if errors.As(err, &fiberErr){
+				code = fiberErr.Code
+				message = fiberErr.Message
+			}else{
+				slog.Error("Unhanler Server Error",
+					"error", err,
+					"path", c.Path(),
+					"method", c.Method(),
+				)
 			}
 			return c.Status(code).JSON(fiber.Map{
-				"status":"error",
-				"code": code,
-				"message": message,
+				"error": message,
 			})
 		},
 	})
-
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowMethods: "GET,POST,PUT,DELETE",
