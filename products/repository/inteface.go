@@ -11,6 +11,6 @@ type Repository interface {
 	DeleteProduct(id int) error
 	GetCategoryByID(id int) (string, error)
 	GetAllCategories() ([]dto.Category, error)
-	DeductProductStock(id int, quantity int) error
+	UpdateStock(id int, quantity int) error
 
 }
